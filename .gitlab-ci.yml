@@ -1,0 +1,35 @@
+stages:
+  - build
+
+
+build-backend-code-job:
+  stage: build  
+  only:
+    changes:
+    - backend/*
+  script:
+    - echo BE_JOB_ID=$CI_JOB_ID >> backend_job_id.env
+    - cd backend
+    - mvn package
+  artifacts:
+    paths:
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
+    reports:
+      dotenv: backend_job_id.env  
+
+build-frontend-code-job:
+  stage: build  
+  only:
+    changes:
+    - frontend/*
+  script: 
+    - echo FE_JOB_ID=$CI_JOB_ID >> frontend_job_id.env       
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/frontend
+    reports:
+      dotenv: frontend_job_id.env
+
