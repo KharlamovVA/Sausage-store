@@ -39,7 +39,7 @@ telegram-notification-backend:
     - backend/*
   script:
     - >-
-      curl -X POST -H 'Content-type: application/json' --data 'payload={"chat_id": "-1001763459775", "text": ":white_check_mark: Василий Харламов собрал $BE_JOB_NAME. Артефакт доступен по адресу <'${ARTIFACT_URL}'|'${BE_JOB_ID}'>" }' "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+      curl -X POST --data-urlencode 'payload={"chat_id": "-1001763459775", "text": ":white_check_mark: Василий Харламов собрал *'${BE_JOB_NAME}'* <'${ARTIFACT_URL}'>" }' https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage
   needs:
     - build-backend-code-job
 
@@ -50,6 +50,6 @@ telegram-notification-frontend:
     - frontend/*
   script:
     - >-
-      curl -X POST -H 'Content-type: application/json' --data 'payload={"chat_id": "-1001763459775", "text": ":white_check_mark: Василий Харламов собрал $FE_JOB_NAME. Артефакт доступен по адресу <'${ARTIFACT_URL}'|'${FE_JOB_ID}'>" }' "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"
+      curl -X POST --data-urlencode 'payload={"chat_id": "-1001763459775", "text": ":white_check_mark: Василий Харламов собрал *'${FE_JOB_NAME}'* <'${ARTIFACT_URL}'>" }' https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage
   needs:
     - build-frontend-code-job 
