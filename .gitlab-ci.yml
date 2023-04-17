@@ -11,6 +11,8 @@ build-backend-code-job:
     - echo BE_JOB_ID=$CI_JOB_ID >> backend_job_id.env
     - cd backend
     - mvn package
+    - echo $CI_JOB_ID
+    - cat backend_job_id.env
   artifacts:
     paths:
       - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
@@ -27,6 +29,8 @@ build-frontend-code-job:
     - cd frontend
     - npm install
     - npm run build
+    - echo $CI_JOB_ID
+    - cat frontend_job_id.env
   artifacts:
     paths:
       - frontend/dist/frontend
