@@ -9,7 +9,7 @@ build-backend-code-job:
     changes:
     - backend/*
   script:
-    - echo BE_JOB_ID=$CI_JOB_ID >> job1_vars.env
+    - echo "BE_JOB_ID=$CI_JOB_ID" >> job1_vars.env
     - echo BE_JOB_NAME=$CI_JOB_NAME
     - cd backend
     - mvn package
@@ -26,7 +26,7 @@ build-frontend-code-job:
     changes:
     - frontend/*
   script: 
-    - echo FE_JOB_ID=$CI_JOB_ID >> job2_vars.env
+    - echo "FE_JOB_ID=$CI_JOB_ID" >> job2_vars.env
     - echo FE_JOB_NAME=$CI_JOB_NAME      
     - cd frontend
     - npm install
@@ -44,8 +44,9 @@ telegram-notification-backend:
     changes:
     - backend/*
   script:
-    - source job1_vars.env
-    - echo $BE_JOB_ID
+    - echo "$BE_JOB_ID"
+  dependencies:
+    - build  
   needs:
     - build-backend-code-job
 
@@ -55,7 +56,8 @@ telegram-notification-frontend:
     changes:
     - frontend/*
   script:
-    - source job2_vars.env
     - echo $FE_JOB_ID
   needs:
     - build-frontend-code-job 
+  dependencies:
+    - build  
