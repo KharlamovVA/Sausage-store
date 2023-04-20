@@ -17,7 +17,7 @@ build-backend-code-job:
     - mvn -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
   artifacts:
     paths:
-      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
+    - ${CI_PROJECT_DIR}/.m2/ # сохранение зависимостей для SAST 
     reports:
       dotenv:
         job_vars.env
