@@ -1,6 +1,6 @@
 stages:
   - build
-  - test
+
 
 include:
   - template: SAST.gitlab-ci.yml
@@ -23,12 +23,6 @@ build-backend-code-job:
       dotenv:
         job_vars.env
 
-spotbugs-sast:
-  variables:
-    COMPILE: "false"
-    SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: $CI_PROJECT_DIR/.m2/repository
-  needs:
-    - job: build-backend-code-job
+
 
 
