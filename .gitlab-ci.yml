@@ -21,6 +21,7 @@ build-backend-code-job:
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
+      - backend/target/
     reports:
       dotenv:
         job_vars.env
@@ -113,3 +114,4 @@ spotbugs-sast:
     MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository # при сборке указывать эту папку через аргумент -Dmaven.repo.local 
   needs:
     - build-backend-code-job
+    - build-frontend-code-job
