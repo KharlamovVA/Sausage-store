@@ -1,7 +1,9 @@
 stages:
   - build
+  - notify
   - test
 
+# <--------------- Stage 1: build ---------------------->
 
 build-backend-code-job:
   stage: build  
@@ -38,6 +40,35 @@ build-frontend-code-job:
       dotenv:
         job_vars.env
 
+
+# <--------------- Stage 2: notify ---------------------->
+
+telegram-notification-backend:
+  stage: notify
+  only:
+    changes:
+    - backend/*
+  script:
+    - echo $BE_JOB_NAME
+  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал $BE_JOB_NAME https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+  needs:
+    - build-backend-code-job
+
+telegram-notification-frontend:
+  stage: notify
+  only:
+    changes:
+    - frontend/*
+  script:
+    - echo $FE_JOB_NAME
+    #- 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал $FE_JOB_NAME https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+  needs:
+    - build-frontend-code-job
+
+
+# <--------------- Stage 3: test ---------------------->
+
+# < --- sonarqube sast --- >
 sonarqube-backend-sast:
   stage: test
   image: maven:3.8-openjdk-16 
@@ -68,3 +99,6 @@ sonarqube-frontend-sast:
       -Dsonar.login=${CI_SONAR_TOKEN}
   needs:
     - build-frontend-code-job
+
+# < --- gitlab sast --- >
+
