@@ -1,6 +1,6 @@
 stages:
   - build
-  - notify
+  - test
 
 
 build-backend-code-job:
@@ -38,22 +38,33 @@ build-frontend-code-job:
       dotenv:
         job_vars.env
 
-telegram-notification-backend:
-  stage: notify
-  only:
-    changes:
-    - backend/*
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16 
   script:
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал $BE_JOB_NAME https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - cd backend
+    - >
+      mvn verify sonar:sonar 
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=17_VASILY_KHARLAMOV_BACKEND
+      -Dsonar.projectKey=${CI_BACKPROJ_KEY}
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
   needs:
     - build-backend-code-job
 
-telegram-notification-frontend:
-  stage: notify
-  only:
-    changes:
-    - frontend/*
+sonarqube-frontend-sast:
+  stage: test
+  image: sonarsource/sonar-scanner-cli:latest
   script:
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал $FE_JOB_NAME https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - cd frontend
+    - >
+      sonar-scanner 
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=17_VASILY_KHARLAMOV_FRONTEND
+      -Dsonar.projectKey=${CI_FRONTPROJ_KEY}
+      -Dsonar.sources=.
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
   needs:
     - build-frontend-code-job
