@@ -1,9 +1,6 @@
 stages:
   - build
-
-
-include:
-  - template: SAST.gitlab-ci.yml
+  - test
 
 
 build-backend-code-job:
@@ -15,14 +12,55 @@ build-backend-code-job:
     - echo "BE_JOB_ID=$CI_JOB_ID" >> job_vars.env
     - echo BE_JOB_NAME=$CI_JOB_NAME >> job_vars.env
     - cd backend
-    - mvn package -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+    - mvn package
   artifacts:
     paths:
-    - $CI_PROJECT_DIR/.m2/ 
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv:
         job_vars.env
 
+build-frontend-code-job:
+  stage: build  
+  only:
+    changes:
+    - frontend/*
+  script: 
+    - echo "FE_JOB_ID=$CI_JOB_ID" >> job_vars.env
+    - echo FE_JOB_NAME=$CI_JOB_NAME >> job_vars.env      
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/frontend
+    reports:
+      dotenv:
+        job_vars.env
 
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16 
+  script:
+    - cd backend
+    - >
+      mvn verify sonar:sonar -Dsonar.qualitygate.wait=true
+      -Dsonar.projectKey=${CI_BACKPROJ_KEY}
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
+  needs:
+    - build-backend-code-job
 
-
+sonarqube-frontend-sast:
+  stage: test
+  image: sonarsource/sonar-scanner-cli:latest
+  script:
+    - cd frontand
+    - >
+      sonar-scanner -Dsonar.qualitygate.wait=true
+      -Dsonar.projectKey=${CI_FRONTPROJ_KEY}
+      -Dsonar.sources=.
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
+  needs:
+    - build-frontend-code-job
