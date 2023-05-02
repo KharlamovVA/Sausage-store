@@ -6,6 +6,11 @@ stages:
 include:
   - template: Security/SAST.gitlab-ci.yml
 
+cache: &global_cache
+  key: global_cache
+  paths: 
+    - ${CI_PROJECT_DIR}/.m2/repository
+
 # <--------------- Stage 1: Build ---------------------->
 
 build-backend-code-job:
@@ -20,7 +25,7 @@ build-backend-code-job:
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
-      - backend/target/
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv:
         job_vars.env
@@ -100,7 +105,7 @@ telegram-notification-backend:
     - backend/*
   script:
     - echo $BE_JOB_ID
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал backend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    #- 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал backend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-backend-code-job
     - sonarqube-backend-sast
@@ -112,7 +117,7 @@ telegram-notification-frontend:
     - frontend/*
   script:
     - echo $FE_JOB_ID
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал frontend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    #- 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал frontend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-frontend-code-job
     - sonarqube-frontend-sast
