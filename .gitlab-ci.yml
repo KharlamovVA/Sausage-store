@@ -24,10 +24,6 @@ build-backend-code-job:
     - mvn package -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
   artifacts:
     paths:
-<<<<<<< HEAD
-=======
-      - ${CI_PROJECT_DIR}/.m2/
->>>>>>> 7e4a34a834e613f075a5c95a8dac3ec77303d12a
       - backend/target/sausage-store-$CI_JOB_ID-SNAPSHOT.jar
     reports:
       dotenv:
