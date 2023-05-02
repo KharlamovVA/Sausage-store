@@ -25,7 +25,7 @@ build-backend-code-job:
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
-      - backend/target/sausage-store-${VERSION}-SNAPSHOT.jar
+      - backend/target/sausage-store-$CI_JOB_ID-SNAPSHOT.jar
     reports:
       dotenv:
         job_vars.env
