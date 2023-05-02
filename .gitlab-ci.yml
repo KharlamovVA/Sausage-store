@@ -9,7 +9,7 @@ include:
 cache: &global_cache
   key: global_cache
   paths: 
-    - ${CI_PROJECT_DIR}/.m2/repository
+    - .m2/repository
 
 # <--------------- Stage 1: Build ---------------------->
 
@@ -24,11 +24,11 @@ build-backend-code-job:
     - mvn package -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
   artifacts:
     paths:
-      - ${CI_PROJECT_DIR}/.m2/
-      - backend/target/sausage-store-${VERSION}-SNAPSHOT.jar
+      - backend/target/sausage-store-$CI_JOB_ID-SNAPSHOT.jar
     reports:
       dotenv:
         job_vars.env
+
 
 build-frontend-code-job:
   stage: build  
