@@ -6,6 +6,11 @@ stages:
 include:
   - template: Security/SAST.gitlab-ci.yml
 
+cache: &global_cache
+  key: global_cache
+  paths: 
+    - .m2/repository
+
 # <--------------- Stage 1: Build ---------------------->
 
 build-backend-code-job:
@@ -20,10 +25,11 @@ build-backend-code-job:
   artifacts:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
-      - backend/target/
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
     reports:
       dotenv:
         job_vars.env
+
 
 build-frontend-code-job:
   stage: build  
