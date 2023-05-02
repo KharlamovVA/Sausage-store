@@ -6,10 +6,10 @@ stages:
 include:
   - template: Security/SAST.gitlab-ci.yml
 
-cache: &global_cache
-  key: global_cache
-  paths: 
-    - .m2/repository
+#cache: &global_cache
+#  key: global_cache
+#  paths: 
+#    - .m2/repository
 
 # <--------------- Stage 1: Build ---------------------->
 
