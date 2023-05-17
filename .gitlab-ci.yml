@@ -138,7 +138,7 @@ telegram-notification-backend:
     - backend/*
   script:
     - echo $BE_JOB_ID
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал backend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-backend-code-job
     - sonarqube-backend-sast
