@@ -11,7 +11,7 @@ cache: &global_cache
   key: global_cache
   paths: 
     - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
-    - frontend/dist/frontend # для хранения зависимостей сборки фронтенда
+    - .npm/ # для хранения зависимостей сборки фронтенда 
 
 
 # <--------------- Stage 1: Build ---------------------->
@@ -122,7 +122,7 @@ upload-frontend-release:
   script:
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend/
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend_Inline/
 
 
 # <--------------- Stage 4: Notify ---------------------->
@@ -139,6 +139,7 @@ telegram-notification-backend:
   needs:
     - build-backend-code-job
     - sonarqube-backend-sast
+    - upload-backend-release
 
 telegram-notification-frontend:
   stage: notify
@@ -151,4 +152,5 @@ telegram-notification-frontend:
   needs:
     - build-frontend-code-job
     - sonarqube-frontend-sast
+    - upload-frontend-release
 
