@@ -11,7 +11,7 @@ cache: &global_cache
   key: global_cache
   paths: 
     - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
-    - .npm/ # для хранения зависимостей сборки фронтенда 
+
 
 
 # <--------------- Stage 1: Build ---------------------->
@@ -122,7 +122,7 @@ upload-frontend-release:
   script:
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend_Inline/
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend__Attachment/
 
 
 # <--------------- Stage 4: Notify ---------------------->
