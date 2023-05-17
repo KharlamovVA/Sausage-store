@@ -113,6 +113,10 @@ upload-backend-release:
     - echo "BR=$VERSION" >> job_vars.env
     - cd backend
     - mvn -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository -s settings.xml -Dversion.application=${VERSION} -DskipTests deploy
+  artifacts:
+    reports:
+      dotenv:
+        job_vars.env
 
 upload-frontend-release:
   stage: release
@@ -125,7 +129,11 @@ upload-frontend-release:
     - echo "FR=$VERSION" >> job_vars.env 
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend/
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend/sausage-store/${VERSION}/sausage-store-${VERSION}.tar.gz
+  artifacts:
+    reports:
+      dotenv:
+        job_vars.env  
 
 
 # <--------------- Stage 4: Notify ---------------------->
