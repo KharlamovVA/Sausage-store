@@ -151,7 +151,7 @@ telegram-notification-frontend:
     - frontend/*
   script:
     - echo $FE_JOB_ID
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал frontend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-frontend-code-job
     - sonarqube-frontend-sast
