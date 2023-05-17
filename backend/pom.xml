@@ -18,6 +18,16 @@
         <sonar.projectKey>test_manual</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>sausage-store</id>
+            <name>sausage-store</name>
+            <url>${env.NEXUS_REPO_URL}/sausage-store/</url>
+        </repository>
+    </distributionManagement>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
