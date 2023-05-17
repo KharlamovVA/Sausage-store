@@ -110,6 +110,7 @@ upload-backend-release:
   needs:
     - build-backend-code-job
   script:
+    - echo "BR=$VERSION" >> job_vars.env
     - cd backend
     - mvn -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository -s settings.xml -Dversion.application=${VERSION} -DskipTests deploy
 
@@ -121,9 +122,10 @@ upload-frontend-release:
   needs:
     - build-frontend-code-job
   script:
+    - echo "FR=$VERSION" >> job_vars.env 
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend_Attachment/
+    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-frontend/
 
 
 # <--------------- Stage 4: Notify ---------------------->
@@ -136,6 +138,7 @@ telegram-notification-backend:
     - backend/*
   script:
     - echo $BE_JOB_ID
+    - echo $BR
   #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал backend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$BE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-backend-code-job
@@ -149,6 +152,7 @@ telegram-notification-frontend:
     - frontend/*
   script:
     - echo $FE_JOB_ID
+    - echo $FR
   #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Василий Харламов собрал и протестировал frontend-приложение: https://gitlab.praktikum-services.ru/std-017-017/sausage-store/-/jobs/$FE_JOB_ID/artifacts/download?file_type=archive\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - build-frontend-code-job
