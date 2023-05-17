@@ -11,6 +11,7 @@ cache: &global_cache
   key: global_cache
   paths: 
     - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
+    - .npm/ # для хранения зависимостей сборки фронтенда 
 
 
 
