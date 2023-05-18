@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.yandex.practicum.devops</groupId>
     <artifactId>sausage-store</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${env.VERSION}</version>
     <name>sausage-store</name>
     <description>Backend for sausage-store</description>
     <properties>
@@ -18,6 +18,16 @@
         <sonar.projectKey>test_manual</sonar.projectKey>
         <sonar.qualitygate.wait>true</sonar.qualitygate.wait>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>sausage-store</id>
+            <name>sausage-store</name>
+            <url>${env.NEXUS_REPO_URL}/sausage-store-kharlamov-vasily-backend-release/</url>
+        </repository>
+    </distributionManagement>
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
