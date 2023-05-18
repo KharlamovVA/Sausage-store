@@ -41,4 +41,4 @@ deploy:
   stage: deploy
   script:
      #выполняем простую команду для проверки
-     - ssh ${DEV_USER}@${DEV_HOST} "id" 
+    - ssh ${DEV_USER}@${DEV_HOST} "id" 
