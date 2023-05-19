@@ -23,7 +23,7 @@ stages:
 
 # <--------------- Stage 1: Build --------------------->
 
-build-frontend-code-job:
+build:
   stage: build  
   only:
     changes:
@@ -43,13 +43,13 @@ build-frontend-code-job:
 
 # <--------------- Stage 2: Release --------------------->
 
-upload-frontend-release:
+release:
   stage: release
   only:
     changes:
     - frontend/**/*
   needs:
-    - build-frontend-code-job
+    - build
   script:
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
@@ -64,4 +64,4 @@ deploy:
   - scp ./frontend/sausage-store-frontend.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-frontend.service
   - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_HOST=${DEV_HOST}";export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPOFRONT_URL=${NEXUS_REPOFRONT_URL}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}";setsid /bin/bash -s " < ./frontend/deploy.sh 
  # запускаем фронтэнд  
-  - http-server /home/front-user/frontend/ -p 443 --proxy http://localhost:9000 &  
+  - http-server /home/front-user/ -p 443 --proxy http://localhost:9000 &  
