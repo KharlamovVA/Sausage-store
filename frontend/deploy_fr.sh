@@ -10,7 +10,8 @@ sudo cp ./sausage-store.tar.gz /home/front-user/sausage-store.tar.gz||true #"<..
 sudo mkdir /home/front-user/frontend
 sudo mkdir /home/front-user/test
 sudo cp /home/front-user/sausage-store.tar.gz /home/front-user/test
-sudo tar xf /home/front-user/sausage-store.tar.gz
+sudo tar xzf /home/front-user/sausage-store.tar.gz
+sudo tar xzf /home/front-user/test/sausage-store.tar.gz
 #sudo rm -f /home/front-user/sausage-store.tar.gz||true
 #Обновляем конфиг systemd с помощью рестарта
 sudo systemctl daemon-reload
