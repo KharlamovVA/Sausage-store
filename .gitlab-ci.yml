@@ -1,159 +1,24 @@
+
 stages:
-  - build
-  - test
-  - release
-  - notify
+  - module-pipelines
 
-include:
-  - template: Security/SAST.gitlab-ci.yml
-
-cache: &global_cache
-  key: global_cache
-  paths: 
-    - ${CI_PROJECT_DIR}/.m2/repository # для хранения зависимостей бэкенда
-    - .npm/ # для хранения зависимостей сборки фронтенда 
-
-
-
-# <--------------- Stage 1: Build ---------------------->
-
-build-backend-code-job:
-  stage: build  
+frontend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/frontend/.gitlab-ci.yml"
+    strategy: depend # depend нужен, если какой-нибудь дочерний пайплайн свалился, мы знали, что общий пайплайн тоже идёт с ошибкой
   only:
-    changes:
-    - backend/*
-  script:
-    - echo "BE_JOB_ID=$CI_JOB_ID" >> job_vars.env
-    - cd backend
-    - mvn package -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-  artifacts:
-    paths:
-      - ${CI_PROJECT_DIR}/.m2/
-      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
-    reports:
-      dotenv:
-        job_vars.env
+    changes: # как только происходит изменение в папке frontend, запускается дочерний пайплайн, который лежит в этой папке
+      - frontend/**/*
 
-
-build-frontend-code-job:
-  stage: build  
+backend:
+  stage: module-pipelines
+  trigger:
+    include:
+      - "/backend/.gitlab-ci.yml"
+    strategy: depend
   only:
-    changes:
-    - frontend/*
-  script: 
-    - echo "FE_JOB_ID=$CI_JOB_ID" >> job_vars.env
-    - cd frontend
-    - npm install
-    - npm run build
-  artifacts:
-    paths:
-      - frontend/dist/frontend
-    reports:
-      dotenv:
-        job_vars.env
-
-
-# <--------------- Stage 2: Test ---------------------->
-
-# < --- sonarqube sast --- >
-
-sonarqube-backend-sast:
-  stage: test
-  image: maven:3.8-openjdk-16 
-  script:
-    - cd backend
-    - >
-      mvn verify sonar:sonar 
-      -Dsonar.qualitygate.wait=true
-      -Dsonar.projectName=17_VASILY_KHARLAMOV_BACKEND
-      -Dsonar.projectKey=${CI_BACKPROJ_KEY}
-      -Dsonar.host.url=${CI_SONAR_URL}
-      -Dsonar.login=${CI_SONAR_TOKEN}
-  needs:
-    - build-backend-code-job
-
-sonarqube-frontend-sast:
-  stage: test
-  image: sonarsource/sonar-scanner-cli:latest
-  script:
-    - cd frontend
-    - >
-      sonar-scanner 
-      -Dsonar.qualitygate.wait=true
-      -Dsonar.projectName=17_VASILY_KHARLAMOV_FRONTEND
-      -Dsonar.projectKey=${CI_FRONTPROJ_KEY}
-      -Dsonar.sources=.
-      -Dsonar.host.url=${CI_SONAR_URL}
-      -Dsonar.login=${CI_SONAR_TOKEN}
-  needs:
-    - build-frontend-code-job
-
-# < --- gitlab sast --- >
-
-spotbugs-sast:
-  variables:
-    COMPILE: "false"
-    SAST_JAVA_VERSION: 11
-    MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository # при сборке указывать эту папку через аргумент -Dmaven.repo.local 
-  needs:
-    - build-backend-code-job
-    - build-frontend-code-job
-
-
-# <--------------- Stage 3: Release --------------------->
-
-upload-backend-release:
-  stage: release
-  only:
-    changes:
-      - backend/**/*
-  needs:
-    - build-backend-code-job
-  script:
-    - cd backend
-    - mvn -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository -s settings.xml -Dversion.application=${VERSION} -DskipTests deploy
-
-
-upload-frontend-release:
-  stage: release
-  only:
-    changes:
-    - frontend/**/*
-  needs:
-    - build-frontend-code-job
-  script:
-    - cd frontend/dist
-    - tar czvf sausage-store-${VERSION}.tar.gz frontend
-    - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz
-
-
-
-# <--------------- Stage 4: Notify ---------------------->
-
-
-telegram-notification-backend:
-  stage: notify
-  only:
-    changes:
-    - backend/*
-  script:
-    - echo $BE_JOB_ID
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
-  needs:
-    - build-backend-code-job
-    - sonarqube-backend-sast
-    - upload-backend-release
-
-telegram-notification-frontend:
-  stage: notify
-  only:
-    changes:
-    - frontend/*
-  script:
-    - echo $FE_JOB_ID
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
-  needs:
-    - build-frontend-code-job
-    - sonarqube-frontend-sast
-    - upload-frontend-release
+    changes:  # как только происходит изменение в папке backend, запускается дочерний пайплайн, который лежит в этой папке
+      - backend/**/* 
 
