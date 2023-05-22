@@ -68,6 +68,7 @@ spotbugs-sast:
     SAST_JAVA_VERSION: 11
     MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository # при сборке указывать эту папку через аргумент -Dmaven.repo.local 
   needs:
+    - sonarqube-sast
     - build
 
 # <--------------- Stage 3: Release --------------------->
