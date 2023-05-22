@@ -17,9 +17,11 @@ before_script:
   - chmod 644 ~/.ssh/known_hosts
 
 stages:
-   - build
-   - release
-   - deploy  
+  - build
+  - test
+  - release
+  - notify
+  - deploy  
 
 # <--------------- Stage 1: Build --------------------->
 
@@ -29,19 +31,34 @@ build:
     changes:
     - frontend/**/*
   script: 
-    - echo "FE_JOB_ID=$CI_JOB_ID" >> job_vars.env
     - cd frontend
     - npm install
     - npm run build
   artifacts:
     paths:
       - frontend/dist/frontend
-    reports:
-      dotenv:
-        job_vars.env
 
+# <--------------- Stage 2: Test ---------------------->
 
-# <--------------- Stage 2: Release --------------------->
+# < --- sonarqube sast --- >
+
+sonarqube-sast:
+  stage: test
+  image: sonarsource/sonar-scanner-cli:latest
+  script:
+    - cd frontend
+    - >
+      sonar-scanner 
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=17_VASILY_KHARLAMOV_FRONTEND
+      -Dsonar.projectKey=${CI_FRONTPROJ_KEY}
+      -Dsonar.sources=.
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
+  needs:
+    - build
+
+# <--------------- Stage 3: Release --------------------->
 
 release:
   stage: release
@@ -49,17 +66,30 @@ release:
     changes:
     - frontend/**/*
   needs:
-    - build
+    - sonarqube-sast
   script:
     - cd frontend/dist
     - tar czvf sausage-store-${VERSION}.tar.gz frontend
     - curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}" --upload-file sausage-store-${VERSION}.tar.gz ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz
 
+# <--------------- Stage 4: Notify ---------------------->
 
-# <--------------- Stage 3: Deploy --------------------->
+telegram-notification:
+  stage: notify
+  only:
+    changes:
+    - frontend/*
+  script:
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+  needs:
+    - release
+
+# <--------------- Stage 5: Deploy --------------------->
   
 deploy:
   stage: deploy
   script:
   - scp ./frontend/sausage-store-frontend.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-frontend.service
   - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_USER=${DEV_USER}"; export "DEV_HOST=${DEV_HOST}"; export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPOFRONT_URL=${NEXUS_REPOFRONT_URL}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}"; setsid /bin/bash -s " < ./frontend/deploy_fr.sh 
+  needs:
+    - release

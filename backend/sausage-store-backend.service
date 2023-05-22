@@ -7,7 +7,7 @@ Environment="REPORT_PATH=/var/www-data/htdocs/"
 Environment="LOG_PATH=/logs/"
 StandardOutput=append:/logs/out.log
 Restart=always
-ExecStart=java -jar -Dserver.port=9000 /home/jarservice/sausage-store.jar
+ExecStart=java -jar -Dserver.port=9000 /var/jarservice/sausage-store.jar
 SuccessExitStatus=143
 
 [Install]

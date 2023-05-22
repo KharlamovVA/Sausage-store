@@ -7,7 +7,7 @@ sudo cp -rf /home/${DEV_USER}/sausage-store-frontend.service /etc/systemd/system
 #Переносим артефакт в нужную папку
 sudo curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} -o /home/${DEV_USER}/sausage-store-${VERSION}.tar.gz ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz
 sudo tar xf /home/${DEV_USER}/sausage-store-${VERSION}.tar.gz ||true
-sudo cp -R /home/${DEV_USER}/frontend /home/front-user/
+sudo cp -R /home/${DEV_USER}/frontend/ /var/www-data/
 sudo rm -f /home/${DEV_USER}/sausage-store-${VERSION}.tar.gz||true
 #Обновляем конфиг systemd с помощью рестарта
 sudo systemctl daemon-reload

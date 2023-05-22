@@ -20,23 +20,57 @@ before_script:
   - chmod 644 ~/.ssh/known_hosts
 
 stages:
-   - build
-   - release
-   - deploy
+  - build
+  - test
+  - release
+  - notify
+  - deploy
 
 # <--------------- Stage 1: Build ---------------------->
 
 build:
-   stage: build
-   script:
-      - cd backend
-      - mvn package -Dversion.application=${VERSION} -Dmaven.repo.local=${MAVEN_REPO_PATH}
-   rules: # rules и only в данных случаях взаимозаменяемы
+  stage: build  
+  rules: # rules и only в данных случаях взаимозаменяемы
       - changes:
            - backend/**/*
+  script:
+    - cd backend
+    - mvn package -Dversion.application=${VERSION} -Dmaven.repo.local=${MAVEN_REPO_PATH}
+  artifacts:
+    paths:
+      - ${CI_PROJECT_DIR}/.m2/
+      - backend/target/sausage-store-${VERSION}.jar
 
+# <--------------- Stage 2: Test ---------------------->
 
-# <--------------- Stage 2: Release --------------------->
+# < --- sonarqube sast --- >
+
+sonarqube-sast:
+  stage: test
+  image: maven:3.8-openjdk-16 
+  script:
+    - cd backend
+    - >
+      mvn verify sonar:sonar 
+      -Dsonar.qualitygate.wait=true
+      -Dsonar.projectName=17_VASILY_KHARLAMOV_BACKEND
+      -Dsonar.projectKey=${CI_BACKPROJ_KEY}
+      -Dsonar.host.url=${CI_SONAR_URL}
+      -Dsonar.login=${CI_SONAR_TOKEN}
+  needs:
+    - build
+
+# < --- gitlab sast --- >
+
+spotbugs-sast:
+  variables:
+    COMPILE: "false"
+    SAST_JAVA_VERSION: 11
+    MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository # при сборке указывать эту папку через аргумент -Dmaven.repo.local 
+  needs:
+    - build
+
+# <--------------- Stage 3: Release --------------------->
 
 release:
    stage: release
@@ -46,13 +80,27 @@ release:
    rules:
       - changes:
            - backend/**/*
+   needs:
+    - sonarqube-sast
 
+# <--------------- Stage 4: Notify ---------------------->
 
-# <--------------- Stage 3: Deploy --------------------->
-  
+telegram-notification:
+  stage: notify
+  only:
+    changes:
+    - backend/*
+  script:
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+  needs:
+    - release
+
+# <--------------- Stage 5: Deploy --------------------->
 
 deploy:
   stage: deploy
   script:
   - scp ./backend/sausage-store-backend.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-backend.service
   - ssh ${DEV_USER}@${DEV_HOST} "export "CURRENT_VERSION=${VERSION}"; export "VERSION=${VERSION}"; export "DEV_USER=${DEV_USER}"; export "DEV_HOST=${DEV_HOST}"; export "NEXUS_REPO_URL=${NEXUS_REPO_URL}"; export "NEXUS_REPO_USER=${NEXUS_REPO_USER}"; export "NEXUS_REPOBACK_URL=${NEXUS_REPOBACK_URL}"; export "NEXUS_REPO_PASS=${NEXUS_REPO_PASS}"; setsid /bin/bash -s " < ./backend/deploy_bc.sh 
+  needs:
+    - release
