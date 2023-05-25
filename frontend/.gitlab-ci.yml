@@ -10,7 +10,8 @@ stages:
   - test
   - release
   - notify
-  - deploy  
+  - deploy 
+  - info 
 
 # <--------------- Stage 1: Build ---------------------->
 
@@ -97,3 +98,9 @@ deploy:
   needs:
     - release
 
+# <--------------- Stage 6: Info --------------------->
+
+info:
+  stage: info
+  script:
+  - echo 'Stage for rollback'
