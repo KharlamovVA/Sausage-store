@@ -120,5 +120,5 @@ info:
   script: 
   - echo 'Stage for rallback. WTF... Were is this fucking botton?'
   environment:
-    name: deploy-backend-${VERSION}
+    name: deploy-backend-${CI_PIPELINE_ID}
     action: stop

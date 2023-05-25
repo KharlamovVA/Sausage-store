@@ -104,7 +104,7 @@ deploy:
 info:
   stage: info
   script: 
-  - echo 'Stage for rallback. WTF... Were is this fucking botton?'
+  - echo 'Stage for rallback. WTF... Were is this fucking botton? '
   environment:
     name: deploy-frontend-${CI_PIPELINE_ID}
     action: stop
