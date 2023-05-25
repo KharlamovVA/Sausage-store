@@ -95,7 +95,7 @@ telegram-notification:
 deploy:
   stage: deploy
   environment:
-    name: deploy-backend-${CI_PIPELINE_ID}
+    name: back-$CI_COMMIT_REF_SLUG
     on_stop: info
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
@@ -120,5 +120,5 @@ info:
   script: 
   - echo 'Stage for rallback. WTF... Were is this fucking botton?'
   environment:
-    name: deploy-backend-${CI_PIPELINE_ID}
+    name: back-$CI_COMMIT_REF_SLUG
     action: stop
