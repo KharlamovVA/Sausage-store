@@ -27,6 +27,7 @@ build:
   artifacts:
     paths:
       - frontend/dist/frontend
+    expire_in: 1 week
 
 # <--------------- Stage 2: Test ---------------------->
 

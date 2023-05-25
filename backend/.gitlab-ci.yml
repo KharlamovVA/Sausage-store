@@ -30,6 +30,7 @@ build:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
       - backend/target/sausage-store-${VERSION}.jar
+    expire_in: 1 week
 
 # <--------------- Stage 2: Test ---------------------->
 
