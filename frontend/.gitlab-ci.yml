@@ -10,10 +10,10 @@ stages:
   - test
   - release
   - notify
-  - deploy  
-  - info
+  - deploy 
+  - info 
 
-# <--------------- Stage 1: Build --------------------->
+# <--------------- Stage 1: Build ---------------------->
 
 build:
   stage: build  
@@ -27,6 +27,7 @@ build:
   artifacts:
     paths:
       - frontend/dist/frontend
+    expire_in: 1 week
 
 # <--------------- Stage 2: Test ---------------------->
 
@@ -71,7 +72,7 @@ telegram-notification:
     - frontend/*
   script:
     - echo ${VERSION}
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - release
 
@@ -80,8 +81,7 @@ telegram-notification:
 deploy:
   stage: deploy
   environment:
-    name: deploy-frontend-${VERSION}
-    on_stop: info
+    name: frontend-env
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
@@ -98,12 +98,9 @@ deploy:
   needs:
     - release
 
-# <--------------- Stage 6: Info --------------------->
+# <--------------- Stage 6: Info --------------- ------>
 
 info:
   stage: info
-  script: 
-  - echo 'Stage for rallback. WTF... Were is this fucking botton?'
-  environment:
-    name: deploy-frontend-${VERSION}
-    action: stop
+  script:
+  - echo 'Stage for rollback'

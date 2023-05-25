@@ -16,6 +16,7 @@ stages:
   - deploy
   - info
 
+
 # <--------------- Stage 1: Build -------- -------------->
 
 build:
@@ -30,6 +31,7 @@ build:
     paths:
       - ${CI_PROJECT_DIR}/.m2/
       - backend/target/sausage-store-${VERSION}.jar
+    expire_in: 1 week
 
 # <--------------- Stage 2: Test ---------------------->
 
@@ -85,22 +87,21 @@ telegram-notification:
     - backend/*
   script:
     - echo ${VERSION}
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - release
 
-# <--------------- Stage 5: Deploy --------------------->
+# <--------------- Stage 5: Deploy ---------------------->
 
 deploy:
   stage: deploy
   environment:
-    name: deploy-backend-${VERSION}
-    on_stop: info
+    name: backend-env
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
   - eval $(ssh-agent -s)
-  #сохраняем сгенеренный ранее приватный ключ для раннера
+  #сохраняем сгенерированный ранее приватный ключ для раннера
   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
   - mkdir -p ~/.ssh
   - chmod 600 ~/.ssh
@@ -112,12 +113,10 @@ deploy:
   needs:
     - release
 
-# <--------------- Stage 6: Info --------------------->
+# <--------------- Stage 6: Info -------- ------------->
 
 info:
   stage: info
-  script: 
-  - echo 'Stage for rallback. WTF... Were is this fucking botton?'
-  environment:
-    name: deploy-backend-${VERSION}
-    action: stop
+  script:
+  - echo 'Stage for rollback'
+
