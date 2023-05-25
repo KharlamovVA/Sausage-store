@@ -81,7 +81,7 @@ telegram-notification:
 deploy:
   stage: deploy
   environment:
-    name: front-$CI_COMMIT_REF_SLUG
+    name: front-$CI_JOB_ID
     on_stop: info
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
@@ -106,5 +106,5 @@ info:
   script: 
   - echo 'Stage for rallback. WTF... Were is this fucking botton? '
   environment:
-    name: front-$CI_COMMIT_REF_SLUG
+    name: front-$CI_JOB_ID
     action: stop
