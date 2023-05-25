@@ -118,7 +118,7 @@ deploy:
 info:
   stage: info
   script: 
-  - echo 'Stage for rallback. WTF... Were is this fucking botton?'
+  - echo 'Stage for rallback. WTF... Were is this fucking botton? '
   environment:
     name: ${CI_JOB_ID}
     action: stop
