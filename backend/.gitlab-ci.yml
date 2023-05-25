@@ -14,7 +14,7 @@ stages:
   - release
   - notify
   - deploy
-  - info
+
 
 # <--------------- Stage 1: Build -------- -------------->
 
@@ -95,8 +95,7 @@ telegram-notification:
 deploy:
   stage: deploy
   environment:
-    name: ${CI_JOB_ID}
-    on_stop: info
+    name: backend-env
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
@@ -113,12 +112,3 @@ deploy:
   needs:
     - release
 
-# <--------------- Stage 6: Info --------------------->
-
-info:
-  stage: info
-  script: 
-  - echo 'Stage for rallback. WTF... Were is this fucking botton? '
-  environment:
-    name: ${CI_JOB_ID}
-    action: stop
