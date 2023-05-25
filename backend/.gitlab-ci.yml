@@ -86,7 +86,7 @@ telegram-notification:
     - backend/*
   script:
     - echo ${VERSION}
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - release
 

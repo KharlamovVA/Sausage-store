@@ -71,7 +71,7 @@ telegram-notification:
     - frontend/*
   script:
     - echo ${VERSION}
-  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия frontend сосисочной — ${VERSION}. Скачать frontend можно по ссылке: ${NEXUS_REPOFRONT_URL}/${VERSION}/sausage-store-${VERSION}.tar.gz\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - release
 
