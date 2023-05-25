@@ -103,7 +103,7 @@ deploy:
 info:
   stage: info
   script: 
-  - echo 'Stage for rallback'
+  - echo 'Stage for rallback. WTF... Were is this fucking botton?'
   environment:
     name: deploy-frontend-${VERSION}
     action: stop
