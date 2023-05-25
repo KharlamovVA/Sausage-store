@@ -104,3 +104,6 @@ info:
   stage: info
   script: 
   - echo 'Stage for rallback'
+  environment:
+    name: deploy-frontend-${VERSION}
+    action: stop
