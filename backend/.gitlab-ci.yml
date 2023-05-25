@@ -91,6 +91,9 @@ telegram-notification:
 
 deploy:
   stage: deploy
+  environment:
+    name: deploy-backend-${VERSION}
+    url: http://std-017-17.praktikum-services.tech:443/#
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
