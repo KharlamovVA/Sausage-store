@@ -113,7 +113,7 @@ deploy:
   needs:
     - release
 
-# <--------------- Stage 6: Info --------------------->
+# <--------------- Stage 6: Info -------- ------------->
 
 info:
   stage: info
