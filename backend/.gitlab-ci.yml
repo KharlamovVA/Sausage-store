@@ -6,7 +6,7 @@ cache:
 variables:
    VERSION: 1.0.${CI_PIPELINE_ID}
    MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
-   JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+   JAVA_OPTS: -XX:MaxRAMPercentage=90 # чтобы Maven не съел всю свободную оперативку
 
 stages:
   - build
@@ -83,7 +83,8 @@ telegram-notification:
     changes:
     - backend/*
   script:
-    - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
+    - echo ${VERSION}
+  #  - 'curl -X POST -H "Content-Type: application/json" -d "{\"chat_id\": \"-1001763459775\", \"text\": \"Вышла новая версия backend сосисочной — ${VERSION}. Скачать backend можно по ссылке: ${NEXUS_REPOBACK_URL}/${VERSION}/sausage-store-${VERSION}.jar\"}" https://api.telegram.org/$CI_TEL_TOKEN/sendMessage '
   needs:
     - release
 
@@ -91,6 +92,9 @@ telegram-notification:
 
 deploy:
   stage: deploy
+  environment:
+    name: deploy-backend-${VERSION}
+    url: http://std-017-17.praktikum-services.tech:443/#
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
   - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
