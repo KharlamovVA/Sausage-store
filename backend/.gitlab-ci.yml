@@ -95,7 +95,7 @@ telegram-notification:
 deploy:
   stage: deploy
   environment:
-    name: deploy-backend-${VERSION}
+    name: deploy-backend-${CI_PIPELINE_ID}
     on_stop: info
   before_script:
   #устанавливаем ssh-agent для удобства аутентификации по ssh
